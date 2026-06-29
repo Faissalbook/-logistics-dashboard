@@ -1,0 +1,8 @@
+[
+  { "id": "s_001", "userId": "u_006", "label": "Your story", "isOwn": true, "seen": false },
+  { "id": "s_002", "userId": "u_003", "seen": false },
+  { "id": "s_003", "userId": "u_001", "seen": false },
+  { "id": "s_004", "userId": "u_002", "seen": true },
+  { "id": "s_005", "userId": "u_005", "seen": false },
+  { "id": "s_006", "userId": "u_004", "seen": true }
+]

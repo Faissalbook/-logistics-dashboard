@@ -1,7 +1,7 @@
 {
-  "name": "chinese-translator-app",
+  "name": "triboo-social-kit",
   "version": "1.0.0",
-  "description": "AI-powered multilingual Chinese translator with Pinyin",
+  "description": "Triboo Social Kit — a modern social media starter (React + Vite + Express).",
   "scripts": {
     "dev": "concurrently --names \"server,client\" --prefix-colors \"red,blue\" \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd server && npm run dev",

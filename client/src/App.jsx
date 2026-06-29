@@ -3,11 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAppStore } from './store/appStore';
 import Layout from './components/Layout';
-import Translator from './pages/Translator';
-import History from './pages/History';
-import Favorites from './pages/Favorites';
-import Phrasebook from './pages/Phrasebook';
-import Settings from './pages/Settings';
+import Feed from './pages/Feed';
+import Explore from './pages/Explore';
+import Create from './pages/Create';
+import Notifications from './pages/Notifications';
+import Profile from './pages/Profile';
 
 export default function App() {
   const isDark = useAppStore((s) => s.isDark);
@@ -21,25 +21,26 @@ export default function App() {
       <Toaster
         position="top-center"
         toastOptions={{
-          duration: 2500,
+          duration: 2200,
           style: {
             background: isDark ? '#1e1e20' : '#fff',
             color: isDark ? '#f4f4f6' : '#0f0f11',
             borderRadius: '12px',
             border: `1px solid ${isDark ? '#2a2a2e' : '#e2e0db'}`,
             fontSize: '14px',
-            fontWeight: '500',
+            fontWeight: 500,
             boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
           },
         }}
       />
       <Layout>
         <Routes>
-          <Route path="/" element={<Translator />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/favorites" element={<Favorites />} />
-          <Route path="/phrasebook" element={<Phrasebook />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/" element={<Feed />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/create" element={<Create />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:username" element={<Profile />} />
         </Routes>
       </Layout>
     </BrowserRouter>

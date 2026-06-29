@@ -1,37 +1,32 @@
-# 中文 AI Translator
+# Triboo Social Kit
 
-AI-powered multilingual translator from Arabic, French & English into Simplified Chinese Mandarin with Pinyin pronunciation.
+A modern, mobile-first social media starter — feed, stories, posts, comments,
+profiles, notifications and discovery — built with React, Vite, Tailwind and
+Framer Motion on a lightweight Express API with mock data.
 
 ## Features
 
-- 🌐 Auto-detect Arabic, French, English
-- 🇨🇳 Accurate Simplified Chinese translation via OpenAI GPT-4o
-- 🔤 Full Pinyin with tone marks (pinyin-pro)
-- 🔊 Native Chinese audio (Web Speech API)
-- 📱 Mobile-first responsive design
-- 🌙 Dark / Light mode
-- 📚 Translation history (up to 100)
-- ⭐ Favorites / bookmarks
-- 📖 Business Chinese phrasebook (26 phrases, 8 categories)
-- 🎤 Voice input (browser SpeechRecognition API)
-- 📋 Copy, Share, Export
+- Feed with stories, posts, likes, comments, shares, saves
+- Explore with search, trending tags, suggested users, post grid
+- Create flow with gradient cover picker and tag input
+- Activity feed (likes, follows, comments, mentions) with read state
+- Profiles with stats, bio, follow/unfollow, post grid, tabs
+- Light & dark mode (persisted)
+- Persistent likes, saves and follows via Zustand + localStorage
+- Smooth motion via Framer Motion
+- Toast feedback via react-hot-toast
+- Mobile-first responsive layout with safe-area aware bottom nav
 
 ## Quick Start
 
 ```bash
-# 1. Install all dependencies
 npm run install:all
-
-# 2. Configure API key
 cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-
-# 3. Start development servers
 npm run dev
 ```
 
 - Client: http://localhost:5173
-- Server API: http://localhost:3001
+- API:    http://localhost:3001
 
 ## Production Build
 
@@ -42,31 +37,36 @@ npm start       # serves everything from Express on port 3001
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, Vite, Tailwind CSS, Framer Motion |
-| State | Zustand (persisted to localStorage) |
-| Routing | React Router v6 |
-| Backend | Node.js, Express |
-| AI | OpenAI GPT-4o-mini |
-| Pinyin | pinyin-pro |
-| TTS | Web Speech API (browser-native) |
-| Voice Input | Web SpeechRecognition API |
+| Layer    | Tech                                            |
+|----------|-------------------------------------------------|
+| Frontend | React 18, Vite, Tailwind CSS, Framer Motion     |
+| State    | Zustand (persisted to localStorage)             |
+| Routing  | React Router v6                                 |
+| Backend  | Node.js, Express                                |
+| Data     | JSON mock store (`server/data/`)                |
 
 ## API Endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/translate` | Translate text to Chinese + Pinyin |
-| GET | `/api/phrasebook` | Get business phrases |
-| GET | `/api/phrasebook/categories` | Get phrase categories |
-| GET | `/api/health` | Server health & API key status |
+| Method | Path                          | Purpose                          |
+|--------|-------------------------------|----------------------------------|
+| GET    | `/api/posts`                  | Feed (newest first)              |
+| POST   | `/api/posts`                  | Create a post                    |
+| GET    | `/api/posts/:id`              | Single post                      |
+| POST   | `/api/posts/:id/like`         | Toggle like                      |
+| GET    | `/api/posts/:id/comments`     | List comments                    |
+| POST   | `/api/posts/:id/comments`     | Add a comment                    |
+| GET    | `/api/users`                  | All users                        |
+| GET    | `/api/users/:username`        | Profile + posts                  |
+| GET    | `/api/notifications`          | Activity feed                    |
+| POST   | `/api/notifications/read`     | Mark all read                    |
+| GET    | `/api/trending`               | Trending tags                    |
+| GET    | `/api/stories`                | Stories bar                      |
+| GET    | `/api/health`                 | Health check                     |
 
 ## Environment Variables
 
 ```env
-OPENAI_API_KEY=sk-...      # Required for translation
-PORT=3001                  # Server port (default: 3001)
-CLIENT_URL=http://localhost:5173  # For CORS
+PORT=3001
+CLIENT_URL=http://localhost:5173
 NODE_ENV=development
 ```

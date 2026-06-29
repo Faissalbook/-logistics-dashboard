@@ -1,0 +1,80 @@
+[
+  {
+    "id": "u_001",
+    "username": "sofia.romano",
+    "name": "Sofia Romano",
+    "bio": "Creative director · Milano ☕\nBuilding things that feel good.",
+    "avatarColor": "#E63946",
+    "avatarInitials": "SR",
+    "verified": true,
+    "followers": 18420,
+    "following": 312,
+    "posts": 84,
+    "location": "Milano, IT"
+  },
+  {
+    "id": "u_002",
+    "username": "marco.bianchi",
+    "name": "Marco Bianchi",
+    "bio": "Photographer. Coffee dependent.",
+    "avatarColor": "#0EA5E9",
+    "avatarInitials": "MB",
+    "verified": false,
+    "followers": 4310,
+    "following": 540,
+    "posts": 212,
+    "location": "Roma, IT"
+  },
+  {
+    "id": "u_003",
+    "username": "elena.ferrari",
+    "name": "Elena Ferrari",
+    "bio": "Fashion · Trends · Vibes",
+    "avatarColor": "#C9A227",
+    "avatarInitials": "EF",
+    "verified": true,
+    "followers": 92140,
+    "following": 88,
+    "posts": 401,
+    "location": "Firenze, IT"
+  },
+  {
+    "id": "u_004",
+    "username": "luca.greco",
+    "name": "Luca Greco",
+    "bio": "Front-end @ Triboo. Tinkers with motion.",
+    "avatarColor": "#10B981",
+    "avatarInitials": "LG",
+    "verified": false,
+    "followers": 1280,
+    "following": 410,
+    "posts": 56,
+    "location": "Torino, IT"
+  },
+  {
+    "id": "u_005",
+    "username": "chiara.russo",
+    "name": "Chiara Russo",
+    "bio": "Travel · Food · Stories",
+    "avatarColor": "#8B5CF6",
+    "avatarInitials": "CR",
+    "verified": false,
+    "followers": 7820,
+    "following": 305,
+    "posts": 174,
+    "location": "Napoli, IT"
+  },
+  {
+    "id": "u_006",
+    "username": "you",
+    "name": "You",
+    "bio": "Just joined Triboo Social.",
+    "avatarColor": "#F59E0B",
+    "avatarInitials": "Y",
+    "verified": false,
+    "followers": 24,
+    "following": 58,
+    "posts": 3,
+    "location": "Italia"
+  }
+]

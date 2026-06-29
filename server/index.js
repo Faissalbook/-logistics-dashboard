@@ -4,8 +4,10 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import rateLimit from 'express-rate-limit';
-import translateRoutes from './routes/translate.js';
-import phrasebookRoutes from './routes/phrasebook.js';
+import postsRoutes from './routes/posts.js';
+import usersRoutes from './routes/users.js';
+import notificationsRoutes from './routes/notifications.js';
+import discoverRoutes from './routes/discover.js';
 
 dotenv.config({ path: join(dirname(fileURLToPath(import.meta.url)), '../.env') });
 
@@ -22,25 +24,23 @@ app.use(express.json({ limit: '10mb' }));
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 600,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },
 });
 
 app.use('/api', apiLimiter);
-app.use('/api/translate', translateRoutes);
-app.use('/api/phrasebook', phrasebookRoutes);
+app.use('/api/posts', postsRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api', discoverRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    hasOpenAI: !!process.env.OPENAI_API_KEY,
-    timestamp: new Date().toISOString(),
-  });
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.use((err, req, res, _next) => {
+app.use((err, _req, res, _next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -53,6 +53,5 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => {
-  console.log(`\n🚀 Chinese Translator server running on http://localhost:${PORT}`);
-  console.log(`🔑 OpenAI API Key: ${process.env.OPENAI_API_KEY ? '✅ Loaded' : '❌ Missing (add to .env)'}\n`);
+  console.log(`\nTriboo Social server running on http://localhost:${PORT}\n`);
 });

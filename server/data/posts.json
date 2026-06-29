@@ -1,0 +1,120 @@
+[
+  {
+    "id": "p_001",
+    "authorId": "u_003",
+    "createdAt": "2026-06-28T09:15:00.000Z",
+    "type": "image",
+    "text": "Soft golden hour on the Arno. Some evenings just hand you the shot. ✨",
+    "media": {
+      "kind": "gradient",
+      "from": "#F5E6A3",
+      "to": "#E63946",
+      "label": "Florence · Golden hour"
+    },
+    "tags": ["firenze", "goldenhour", "italia"],
+    "likes": 1240,
+    "comments": 38,
+    "shares": 12
+  },
+  {
+    "id": "p_002",
+    "authorId": "u_001",
+    "createdAt": "2026-06-28T07:42:00.000Z",
+    "type": "text",
+    "text": "Three things I learned shipping the new design system this week:\n\n1. Tokens beat opinions.\n2. Density is a feature.\n3. Document the why, not the what.\n\nWhat would you add?",
+    "tags": ["design", "designsystems"],
+    "likes": 412,
+    "comments": 64,
+    "shares": 21
+  },
+  {
+    "id": "p_003",
+    "authorId": "u_002",
+    "createdAt": "2026-06-27T20:01:00.000Z",
+    "type": "image",
+    "text": "Rooftops, espresso, and a borrowed Leica. 📷",
+    "media": {
+      "kind": "gradient",
+      "from": "#0EA5E9",
+      "to": "#1E293B",
+      "label": "Roma · Twilight"
+    },
+    "tags": ["roma", "filmphotography"],
+    "likes": 318,
+    "comments": 22,
+    "shares": 5
+  },
+  {
+    "id": "p_004",
+    "authorId": "u_005",
+    "createdAt": "2026-06-27T14:25:00.000Z",
+    "type": "image",
+    "text": "Best ragù I've had in years. Nonna won, again. 🍝",
+    "media": {
+      "kind": "gradient",
+      "from": "#8B5CF6",
+      "to": "#EC4899",
+      "label": "Napoli · Ragù"
+    },
+    "tags": ["foodie", "napoli"],
+    "likes": 902,
+    "comments": 71,
+    "shares": 18
+  },
+  {
+    "id": "p_005",
+    "authorId": "u_004",
+    "createdAt": "2026-06-27T10:10:00.000Z",
+    "type": "text",
+    "text": "Spent the morning rebuilding our animation primitives in Framer Motion 11. Spring presets > duration curves, every time.",
+    "tags": ["frontend", "framermotion"],
+    "likes": 184,
+    "comments": 19,
+    "shares": 6
+  },
+  {
+    "id": "p_006",
+    "authorId": "u_003",
+    "createdAt": "2026-06-26T18:50:00.000Z",
+    "type": "image",
+    "text": "Backstage at Milano Fashion Week. The energy is unreal.",
+    "media": {
+      "kind": "gradient",
+      "from": "#C9A227",
+      "to": "#7C2D12",
+      "label": "Milano · Backstage"
+    },
+    "tags": ["fashion", "mfw"],
+    "likes": 2810,
+    "comments": 142,
+    "shares": 56
+  },
+  {
+    "id": "p_007",
+    "authorId": "u_001",
+    "createdAt": "2026-06-26T08:20:00.000Z",
+    "type": "image",
+    "text": "Morning ritual. The new mug landed today.",
+    "media": {
+      "kind": "gradient",
+      "from": "#FB7185",
+      "to": "#FDA4AF",
+      "label": "Studio · Morning"
+    },
+    "tags": ["studio", "ritual"],
+    "likes": 540,
+    "comments": 27,
+    "shares": 4
+  },
+  {
+    "id": "p_008",
+    "authorId": "u_002",
+    "createdAt": "2026-06-25T22:00:00.000Z",
+    "type": "text",
+    "text": "Hot take: every portfolio site should load in under 1.2s. No exceptions.",
+    "tags": ["webperf", "hottake"],
+    "likes": 731,
+    "comments": 88,
+    "shares": 33
+  }
+]

@@ -1,0 +1,8 @@
+[
+  { "id": "n_001", "type": "like", "actorId": "u_003", "postId": "p_002", "createdAt": "2026-06-28T11:30:00.000Z", "read": false },
+  { "id": "n_002", "type": "follow", "actorId": "u_002", "createdAt": "2026-06-28T10:14:00.000Z", "read": false },
+  { "id": "n_003", "type": "comment", "actorId": "u_001", "postId": "p_004", "preview": "Nonna's > Michelin, always.", "createdAt": "2026-06-28T09:01:00.000Z", "read": false },
+  { "id": "n_004", "type": "mention", "actorId": "u_004", "postId": "p_005", "preview": "thanks @you for the spring config!", "createdAt": "2026-06-27T18:22:00.000Z", "read": true },
+  { "id": "n_005", "type": "like", "actorId": "u_005", "postId": "p_007", "createdAt": "2026-06-27T08:00:00.000Z", "read": true },
+  { "id": "n_006", "type": "follow", "actorId": "u_003", "createdAt": "2026-06-26T17:00:00.000Z", "read": true }
+]

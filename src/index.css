@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-page-light text-[#0b0b0b] antialiased dark:bg-page-dark dark:text-white;
+    font-feature-settings: 'cv02', 'cv03';
+  }
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card bg-surface-light shadow-card dark:bg-surface-dark dark:shadow-card-dark;
+  }
+  .input {
+    @apply w-full rounded-xl border border-black/10 bg-white px-4 py-2.5 text-sm outline-none transition
+      placeholder:text-neutral-400 focus:border-needs focus:ring-2 focus:ring-needs/20
+      dark:border-white/10 dark:bg-[#242423] dark:placeholder:text-neutral-500 dark:focus:border-needs-dark;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium text-neutral-500 dark:text-neutral-400;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+      active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-[#0b0b0b] text-white hover:bg-neutral-800 dark:bg-white dark:text-[#0b0b0b] dark:hover:bg-neutral-200;
+  }
+  .btn-secondary {
+    @apply btn border border-black/10 bg-transparent text-[#0b0b0b] hover:bg-black/5
+      dark:border-white/15 dark:text-white dark:hover:bg-white/10;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white hover:bg-[#b83232] dark:bg-danger-dark dark:hover:bg-[#d05555];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold;
+  }
+}
+
+/* Recessive scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(137, 135, 129, 0.35);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

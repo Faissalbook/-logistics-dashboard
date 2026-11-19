@@ -1,0 +1,30 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../node_modules/.tsbuild/tests",
+    "rootDir": "..",
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "tsBuildInfoFile": "../node_modules/.tsbuild/tests.tsbuildinfo"
+  },
+  "include": [
+    "integration",
+    "../scripts",
+    "../e2e",
+    "../playwright.config.ts",
+    "../vitest.config.ts"
+  ],
+  "references": [
+    {
+      "path": "../packages/domain"
+    },
+    {
+      "path": "../functions"
+    }
+  ]
+}

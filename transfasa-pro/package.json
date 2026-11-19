@@ -1,0 +1,46 @@
+{
+  "name": "transfasa-pro",
+  "private": true,
+  "version": "0.1.0",
+  "description": "TransFasa Pro — import & fleet operations platform (see docs/PRD-TransFasa-Pro.md)",
+  "workspaces": [
+    "packages/*",
+    "functions",
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npm run build:functions && concurrently -n emu,web -c red,blue \"npm run emulators\" \"npm run dev -w apps/web\"",
+    "emulators": "firebase emulators:start --project demo-transfasa",
+    "seed:emulator": "tsx scripts/seed-emulator.ts",
+    "build": "npm run build:functions && npm run build -w apps/web",
+    "build:functions": "npm run build -w functions",
+    "lint": "eslint .",
+    "typecheck": "tsc -b",
+    "test": "vitest run --project unit",
+    "test:integration": "npm run build:functions && firebase emulators:exec --project demo-transfasa --only auth,firestore,functions \"vitest run --project integration\"",
+    "test:e2e": "npm run build:functions && firebase emulators:exec --project demo-transfasa --only auth,firestore,functions \"tsx scripts/seed-emulator.ts && playwright test --trace off\"",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "deploy:staging": "npm run build && firebase hosting:channel:deploy staging --project staging",
+    "deploy:prod": "echo 'Production deploy requires a human-approved tag (PRD §10.4).' && exit 1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "^22.9.0",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.15.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "firebase": "^11.0.0",
+    "firebase-tools": "^14.0.0",
+    "globals": "^15.12.0",
+    "tsx": "^4.19.2",
+    "typescript": "~5.6.3",
+    "typescript-eslint": "^8.15.0",
+    "vitest": "^3.2.0"
+  }
+}

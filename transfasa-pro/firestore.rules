@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// TransFasa Pro — Firestore security rules.
+// Mirrors packages/domain/src/rbac.ts (PRD §9.1). Default deny (SEC-04).
+// Every write that touches money, status, users or the audit log goes through
+// Cloud Functions (Admin SDK bypasses these rules), so client writes are denied here
+// unless a later phase explicitly opens a path.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function roles() {
+      return signedIn() && request.auth.token.roles is list ? request.auth.token.roles : [];
+    }
+
+    function hasAnyRole(rs) {
+      return roles().hasAny(rs);
+    }
+
+    function hasSomeRole() {
+      return roles().size() > 0;
+    }
+
+    // users: own profile, or OWNER (user.read)
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || hasAnyRole(['OWNER']));
+      allow write: if false;
+    }
+
+    // audit_log: OWNER, ACCOUNTANT (audit.read). Append-only via functions; never client-writable.
+    match /audit_log/{entry} {
+      allow read: if hasAnyRole(['OWNER', 'ACCOUNTANT']);
+      allow write: if false;
+    }
+
+    // system: chain head & verification status — OWNER read only.
+    match /system/{doc} {
+      allow read: if hasAnyRole(['OWNER']);
+      allow write: if false;
+    }
+
+    // settings: any user with a role (settings.read); writes via functions (settings.write = OWNER).
+    match /settings/{key} {
+      allow read: if hasSomeRole();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

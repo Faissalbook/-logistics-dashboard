@@ -1,0 +1,10 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/domain" },
+    { "path": "packages/i18n" },
+    { "path": "functions" },
+    { "path": "apps/web" },
+    { "path": "tests" }
+  ]
+}

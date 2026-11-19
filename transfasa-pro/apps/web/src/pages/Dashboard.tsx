@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { Stacked } from '../components/Bilingual';
 import { NAV } from '../nav';
+import { OpsDashboard } from './OpsDashboard';
 
 export function DashboardPage() {
   const { profile, roles } = useAuth();
@@ -30,6 +31,8 @@ export function DashboardPage() {
         <p className="card p-5 text-sm text-red-700" role="alert">
           {msg('auth.noRole')}
         </p>
+      ) : can(roles, 'dashboard.ops') ? (
+        <OpsDashboard />
       ) : (
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {modules.map((m) => {

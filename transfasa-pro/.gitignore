@@ -1,6 +1,6 @@
 node_modules/
 dist/
-lib/
+/functions/lib/
 *.tsbuildinfo
 .env
 .env.local
@@ -11,3 +11,4 @@ ui-debug.log
 test-results/
 playwright-report/
 .firebase/
+migration-report/

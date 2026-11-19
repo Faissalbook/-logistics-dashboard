@@ -44,7 +44,7 @@ export function Layout() {
           </button>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-5 lg:px-8 lg:pb-10 lg:pt-8">
+        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 pb-28 pt-5 lg:px-8 lg:pb-10 lg:pt-8">
           <Outlet />
         </main>
 

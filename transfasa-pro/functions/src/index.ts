@@ -6,6 +6,12 @@ import { COL, DOC, db } from './admin';
 import { appendAudit, verifyStoredChain } from './audit';
 import { requireAuth, requirePermission } from './guards';
 import { createUserWithRoles, parseCreateUserInput, parseRoles, setDisabled, setRoles } from './users';
+import { optionalId } from './ops/common';
+import { deleteExpense as deleteExpenseOp, saveExpense as saveExpenseOp, validateExpense as validateExpenseOp } from './ops/expenses';
+import { assignVehicle as assignVehicleOp, saveDriver as saveDriverOp, saveVehicle as saveVehicleOp } from './ops/fleet';
+import { saveReference as saveReferenceOp } from './ops/reference';
+import { opsSummary as opsSummaryOp } from './ops/summary';
+import { saveTrip as saveTripOp, setTripStatus as setTripStatusOp } from './ops/trips';
 
 // Closest Google Cloud region with full Firebase support for Conakry users.
 export const REGION = 'europe-west1';
@@ -77,4 +83,68 @@ export const verifyAuditChainNightly = onSchedule({ schedule: '17 2 * * *', time
     .set({ ...result, checkedAt: new Date().toISOString(), trigger: 'nightly' });
   if (!result.ok) logger.error('AUDIT CHAIN BROKEN', result);
   else logger.info('Audit chain verified', result);
+});
+
+// ---------------------------------------------------------------- Phase 1 — operations
+
+const payload = (data: unknown) => (data as { data?: unknown } | null)?.data;
+
+/** Vehicles (legacy onboarding FLT-05): OWNER, FLEET_MANAGER. Body: { id?, data }. */
+export const saveVehicle = onCall(async (req) => {
+  const actor = requirePermission(req, 'vehicle.commission');
+  return saveVehicleOp(actor, optionalId(req.data), payload(req.data));
+});
+
+/** Drivers: refData.write. Body: { id?, data }. */
+export const saveDriver = onCall(async (req) => {
+  const actor = requirePermission(req, 'refData.write');
+  return saveDriverOp(actor, optionalId(req.data), payload(req.data));
+});
+
+/** Assign driver/trailer to a tractor: refData.write. Body: AssignmentInput. */
+export const assignVehicle = onCall(async (req) => {
+  const actor = requirePermission(req, 'refData.write');
+  return assignVehicleOp(actor, req.data);
+});
+
+/** Destinations, cement types, rate cards: refData.write. Body: { kind, id?, data }. */
+export const saveReference = onCall(async (req) => {
+  const actor = requirePermission(req, 'refData.write');
+  return saveReferenceOp(actor, (req.data as { kind?: unknown } | null)?.kind, optionalId(req.data), payload(req.data));
+});
+
+/** Create/edit trip: trip.write (all scope). Body: { id?, data }. */
+export const saveTrip = onCall(async (req) => {
+  const actor = requirePermission(req, 'trip.write');
+  return saveTripOp(actor, optionalId(req.data), payload(req.data));
+});
+
+/** Trip status transitions; permission depends on the transition (see ops/trips.ts). */
+export const setTripStatus = onCall(async (req) => {
+  const actor = requirePermission(req, 'trip.read');
+  return setTripStatusOp(actor, req.data);
+});
+
+/** Expenses: expense.write (drivers: own). Body: { id?, data }. */
+export const saveExpense = onCall(async (req) => {
+  const actor = requirePermission(req, 'expense.write');
+  return saveExpenseOp(actor, optionalId(req.data), payload(req.data));
+});
+
+export const deleteExpense = onCall(async (req) => {
+  const actor = requirePermission(req, 'expense.write');
+  await deleteExpenseOp(actor, req.data);
+  return { ok: true };
+});
+
+export const validateExpense = onCall(async (req) => {
+  const actor = requirePermission(req, 'expense.validate');
+  await validateExpenseOp(actor, req.data);
+  return { ok: true };
+});
+
+/** Operations dashboard: dashboard.ops (drivers: own trips only). Body: { from, to, vehicleId? }. */
+export const opsSummary = onCall(async (req) => {
+  const actor = requirePermission(req, 'dashboard.ops');
+  return opsSummaryOp(actor, req.data);
 });

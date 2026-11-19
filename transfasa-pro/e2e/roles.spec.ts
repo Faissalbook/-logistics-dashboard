@@ -22,6 +22,10 @@ for (const role of ROLES) {
 
     await expect(page.getByTestId('role-chips')).toContainText(ROLE_LABELS[role].fr);
 
+    // On phones, overflow destinations live in the "Plus" sheet.
+    const more = page.getByRole('button', { name: /^Plus/ });
+    if (await more.isVisible()) await more.click();
+
     for (const g of GATED) {
       const res = page.getByRole('link', { name: new RegExp(`^${g.fr}`) }).first();
       if (can([role], g.perm)) await expect(res).toBeAttached();

@@ -4,6 +4,9 @@ export default defineConfig({
   testDir: 'e2e',
   timeout: 60_000,
   retries: 0,
+  // One shared emulator: run serially so tests that change data don't race.
+  workers: 1,
+  fullyParallel: false,
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:5173',

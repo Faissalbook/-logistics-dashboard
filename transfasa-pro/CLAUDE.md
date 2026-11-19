@@ -4,7 +4,7 @@ Source of truth: `../docs/PRD-TransFasa-Pro.md`. Reference requirement IDs (IMP-
 
 ## Phases
 - Work one phase at a time (PRD §11.1). Stop at the end of each phase, summarise, and wait. Do not start the next phase unprompted.
-- Phase log: `docs/CHANGELOG.md`. Phase 0 is done.
+- Phase log: `docs/CHANGELOG.md`. Phases 0 and 1 are done; next is Phase 2 (profitability: allocation, depreciation, period close, exports).
 
 ## Hard rules
 - Money: integer GNF only, via `@transfasa/domain` (`roundGNF`, `applyRate`, `formatGNF`). Never JS float math on money. Display `1,234,567 GNF`.
@@ -14,7 +14,8 @@ Source of truth: `../docs/PRD-TransFasa-Pro.md`. Reference requirement IDs (IMP-
 - All business math lives in `packages/domain` with unit tests; UI and functions import it, never re-implement it.
 - Every write that touches money, status, users or settings goes through a Cloud Function: `requirePermission(req, '<perm>')` + `auditedTransaction(...)`. Clients never write those collections directly.
 - RBAC lives in `packages/domain/src/rbac.ts`. When you open a Firestore path, add rows to `tests/integration/rules.test.ts` (every path × every role). Default deny.
-- No placeholder/fake business data anywhere except `scripts/seed-emulator.ts` (emulator-only logins).
+- No placeholder/fake business data anywhere except `scripts/seed-emulator.ts` (emulator-only logins; `--e2e` fixtures use E2E… plates).
+- Real business exports (voyages/dépenses JSON, migration reports) never go into the repo.
 
 ## Ask before
 Adding a dependency not in PRD §10.1 · changing the data model (PRD §8) · deleting data or migrations · deploying anywhere but the emulator · widening `firestore.rules` beyond the RBAC matrix.

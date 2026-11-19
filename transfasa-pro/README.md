@@ -40,9 +40,43 @@ npm run test:integration  # security rules × every role, functions authz, audit
 npm run test:e2e          # sign-in and navigation for every role, mobile + desktop
 ```
 
-## Going to a real Firebase project
+## Migrating from the current app (PRD §12)
 
-1. Create the project (Blaze plan, needed for Functions), enable Email/Password auth.
-2. Add it to `.firebaserc`, copy `apps/web/.env.example` to `apps/web/.env.production.local` and fill it in.
-3. Create the first owner: `GCLOUD_PROJECT=<id> GOOGLE_APPLICATION_CREDENTIALS=<sa.json> npx tsx scripts/bootstrap-owner.ts <email> "<Full Name>"`.
-4. Deploy (human-approved): `firebase deploy --project <id>`.
+Export the three JSON files from the current TransFasa app (ask Claude: "export all voyages, dépenses and the résumé from TransFasa") and run:
+
+```bash
+npx tsx scripts/migrate-legacy.ts --trips voyages.json --expenses depenses.json --summary resume.json
+```
+
+Against the emulator this needs nothing else; against the real project see step 8 below. The script:
+- normalises plates, `Dubréka` accents, dates and destination spellings (accented spelling wins; every merge is listed);
+- refuses retired/off-fleet plates (AL7834, AL8735, …) and lists them instead of importing them;
+- never guesses a truck from an expense description — those are listed for review;
+- imports trips and expenses as **validated** history, audit-logged, with deterministic ids so re-running only adds new rows;
+- compares 100 figures (total, every month, truck and region) with the old app and exits with an error on any difference.
+
+The report (`migration-report/`, git-ignored — it contains business data) lists everything to review.
+
+## New Firebase project — one-time setup (owner)
+
+1. **Create** the project at console.firebase.google.com → *Add project* (e.g. `transfasa-pro`). Note the project ID.
+2. **Billing**: switch to the *Blaze* plan (Cloud Functions require it) and set a budget alert (e.g. 25 USD/month — expected cost at this size is a few dollars).
+3. **Authentication** → *Sign-in method* → enable **Email/Password**.
+4. **Firestore** → *Create database* → production mode, location **europe-west1** (same region as the functions).
+5. **Project settings → General → Your apps → Web app**: register it, then copy `apiKey`, `authDomain`, `projectId`, `storageBucket`, `appId` into `apps/web/.env.production.local` (template: `apps/web/.env.example`).
+6. **Service account**: *Project settings → Service accounts → Generate new private key*. Keep the JSON file private (never commit it).
+7. **Deploy** (from `transfasa-pro/`):
+   ```bash
+   npx firebase login
+   npx firebase use --add <project-id>     # alias it "prod"
+   npm run build
+   npx firebase deploy --project <project-id> --only firestore:rules,firestore:indexes,functions,hosting
+   ```
+8. **First owner + data**:
+   ```bash
+   export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json GCLOUD_PROJECT=<project-id>
+   npx tsx scripts/bootstrap-owner.ts <your-email> "<Your Name>"          # prints a temporary password
+   npx tsx scripts/migrate-legacy.ts --trips voyages.json --expenses depenses.json --summary resume.json --project <project-id>
+   ```
+9. Sign in at `https://<project-id>.web.app`, create the other accounts in *Utilisateurs / Users*, add drivers and assign them to trucks in *Flotte / Fleet*, and enter rate cards in *Référentiel / Reference data*.
+10. Run both apps in parallel for two weeks; re-run the migration at cut-over (it only adds the new rows), then freeze the old app.

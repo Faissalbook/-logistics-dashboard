@@ -49,6 +49,70 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ---------------------------------------------------------------- Phase 1 — operations
+    // Role lists mirror the 'all'-scope grants in rbac.ts; tests/integration/rules.test.ts
+    // checks every path × every role against that matrix.
+
+    function vehicleReadAll() {
+      return hasAnyRole(['OWNER', 'PROCUREMENT', 'CUSTOMS', 'FLEET_MANAGER', 'ACCOUNTANT', 'VIEWER']);
+    }
+    function tripReadAll() {
+      return hasAnyRole(['OWNER', 'FLEET_MANAGER', 'ACCOUNTANT', 'VIEWER']);
+    }
+    function expenseReadAll() {
+      return hasAnyRole(['OWNER', 'FLEET_MANAGER', 'ACCOUNTANT', 'VIEWER']);
+    }
+    function isDriver() {
+      return hasAnyRole(['DRIVER']);
+    }
+
+    // vehicles: vehicle.read (all) or the driver currently assigned to it (own)
+    match /vehicles/{id} {
+      allow read: if vehicleReadAll()
+        || (isDriver() && resource.data.currentDriverUserId == request.auth.uid);
+      allow write: if false;
+    }
+
+    match /vehicle_assignments/{id} {
+      allow read: if vehicleReadAll();
+      allow write: if false;
+    }
+
+    // drivers hold personal data: readers of all trips, or the driver's own record
+    match /drivers/{id} {
+      allow read: if tripReadAll()
+        || (isDriver() && resource.data.userId == request.auth.uid);
+      allow write: if false;
+    }
+
+    // reference data: refData.read (every role)
+    match /destinations/{id} {
+      allow read: if hasSomeRole();
+      allow write: if false;
+    }
+    match /cement_types/{id} {
+      allow read: if hasSomeRole();
+      allow write: if false;
+    }
+    match /rate_cards/{id} {
+      allow read: if hasSomeRole();
+      allow write: if false;
+    }
+
+    // trips: trip.read (all), drivers only their own (driverUserId)
+    match /trips/{id} {
+      allow read: if tripReadAll()
+        || (isDriver() && resource.data.driverUserId == request.auth.uid);
+      allow write: if false;
+    }
+
+    // expenses: expense.read (all), drivers only what they entered
+    match /expenses/{id} {
+      allow read: if expenseReadAll()
+        || (isDriver() && resource.data.createdBy == request.auth.uid);
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

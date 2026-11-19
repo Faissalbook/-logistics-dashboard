@@ -13,6 +13,14 @@ export const COL = {
   auditLog: 'audit_log',
   system: 'system',
   settings: 'settings',
+  vehicles: 'vehicles',
+  drivers: 'drivers',
+  assignments: 'vehicle_assignments',
+  destinations: 'destinations',
+  cementTypes: 'cement_types',
+  rateCards: 'rate_cards',
+  trips: 'trips',
+  expenses: 'expenses',
 } as const;
 
 export const DOC = {

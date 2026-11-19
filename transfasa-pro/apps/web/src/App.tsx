@@ -7,6 +7,7 @@ import { AuditPage } from './pages/Audit';
 import { DashboardPage } from './pages/Dashboard';
 import { ExpensesPage } from './pages/Expenses';
 import { FleetPage } from './pages/Fleet';
+import { LegacyImportPage } from './pages/LegacyImport';
 import { ReferencePage } from './pages/Reference';
 import { TripFormPage } from './pages/TripForm';
 import { TripsPage } from './pages/Trips';
@@ -98,6 +99,14 @@ export default function App() {
               element={
                 <RequirePermission perm="user.manage">
                   <UsersPage />
+                </RequirePermission>
+              }
+            />
+            <Route
+              path="admin/import"
+              element={
+                <RequirePermission perm="user.manage">
+                  <LegacyImportPage />
                 </RequirePermission>
               }
             />

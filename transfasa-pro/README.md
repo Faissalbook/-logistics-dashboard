@@ -57,6 +57,31 @@ Against the emulator this needs nothing else; against the real project see step 
 
 The report (`migration-report/`, git-ignored — it contains business data) lists everything to review.
 
+## Publier dans le projet existant `scratch3code` (à côté de ScratchCode)
+
+TransFasa y est isolé : site séparé (`transfasa-pro-gn.web.app`), base Firestore séparée (`transfasa`), fonctions dans un groupe séparé (`transfasa`). Le site, les données, les règles et les fonctions de ScratchCode ne sont pas touchés. Les comptes de connexion sont partagés, mais un compte sans rôle TransFasa ne voit rien.
+
+Prérequis : Node 20+, Git, projet `scratch3code` au forfait **Blaze**, et dans la console Firebase : *Authentication → Sign-in method → Email/Password* activé.
+
+```bash
+git clone -b claude/transfasa-pro-prd-idz1ge https://github.com/faissalbook/-logistics-dashboard.git
+cd -logistics-dashboard/transfasa-pro
+npm ci
+npx firebase login
+npx firebase functions:list --project scratch3code        # voir les fonctions ScratchCode existantes (rien n'est modifié)
+npx firebase firestore:databases:create transfasa --location=europe-west1 --project scratch3code
+npx firebase hosting:sites:create transfasa-pro-gn --project scratch3code
+npm run setup:scratch3code -- votre@email.com              # l'e-mail du compte gérant
+npm run deploy:scratch3code
+```
+
+Si le nom `transfasa-pro-gn` est déjà pris, choisissez-en un autre et remplacez-le dans `firebase.scratch3code.json`.
+
+Ensuite :
+1. Console Firebase → *Authentication → Users → Add user* : créez votre compte avec **le même e-mail** (avant tout le monde).
+2. Ouvrez `https://transfasa-pro-gn.web.app`, connectez-vous, cliquez **« Je suis le gérant »** (ne marche qu'une fois, pour cet e-mail).
+3. Menu *Import ancienne app* : choisissez `voyages.json`, `depenses.json`, `resume.json` → *Importer*. Le contrôle doit afficher « Contrôle OK ».
+
 ## New Firebase project — one-time setup (owner)
 
 1. **Create** the project at console.firebase.google.com → *Add project* (e.g. `transfasa-pro`). Note the project ID.

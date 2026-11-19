@@ -5,7 +5,10 @@ import { logger } from 'firebase-functions';
 import { COL, DOC, db } from './admin';
 import { appendAudit, verifyStoredChain } from './audit';
 import { requireAuth, requirePermission } from './guards';
-import { createUserWithRoles, parseCreateUserInput, parseRoles, setDisabled, setRoles } from './users';
+import { claimOwnership as claimOwnershipOp, createUserWithRoles, parseCreateUserInput, parseRoles, setDisabled, setRoles } from './users';
+import { importLegacyPlan, storedSummary } from './ops/legacyImport';
+import { type LegacySummary, planLegacyImport, reconcile } from '@transfasa/domain';
+import { createHash } from 'node:crypto';
 import { optionalId } from './ops/common';
 import { deleteExpense as deleteExpenseOp, saveExpense as saveExpenseOp, validateExpense as validateExpenseOp } from './ops/expenses';
 import { assignVehicle as assignVehicleOp, saveDriver as saveDriverOp, saveVehicle as saveVehicleOp } from './ops/fleet';
@@ -147,4 +150,39 @@ export const validateExpense = onCall(async (req) => {
 export const opsSummary = onCall(async (req) => {
   const actor = requirePermission(req, 'dashboard.ops');
   return opsSummaryOp(actor, req.data);
+});
+
+// ---------------------------------------------------------------- Go-live helpers
+
+/** Become the first OWNER (see users.ts claimOwnership). */
+export const claimOwnership = onCall(async (req) => {
+  const actor = requireAuth(req);
+  await claimOwnershipOp(actor.uid, req.auth?.token.email);
+  return { ok: true };
+});
+
+/**
+ * OWNER imports the current app's export from the browser (PRD §12) — same code path as
+ * scripts/migrate-legacy.ts. Body: { trips, expenses, summary?, fleet?, dryRun? }.
+ */
+export const importLegacy = onCall({ timeoutSeconds: 540, memory: '512MiB' }, async (req) => {
+  const actor = requirePermission(req, 'user.manage');
+  const d = (req.data ?? {}) as Record<string, unknown>;
+  const pick = (v: unknown, key: string) =>
+    Array.isArray(v) ? v : Array.isArray((v as Record<string, unknown> | null)?.[key]) ? (v as Record<string, unknown[]>)[key] : null;
+  const trips = pick(d.trips, 'voyages');
+  const expenses = pick(d.expenses, 'depenses');
+  if (!trips || !expenses) throw new HttpsError('invalid-argument', 'Fichiers voyages et dépenses requis (trips and expenses files required)');
+  const fleet = Array.isArray(d.fleet) && d.fleet.length ? (d.fleet as string[]) : ['BK2195', 'BN0836', 'AL8734'];
+  const plan = planLegacyImport({ trips: trips as never, expenses: expenses as never }, fleet);
+  const source = createHash('sha256').update(JSON.stringify([trips, expenses])).digest('hex').slice(0, 12);
+  const result = d.dryRun ? null : await importLegacyPlan(plan, source, actor);
+  const recon = !d.dryRun && d.summary ? reconcile(d.summary as LegacySummary, await storedSummary()) : null;
+  return {
+    source,
+    planned: { trips: plan.trips.length, expenses: plan.expenses.length, destinations: plan.destinations.length, plates: plan.plates },
+    result,
+    issues: plan.issues,
+    reconciliation: recon,
+  };
 });

@@ -12,3 +12,7 @@ test-results/
 playwright-report/
 .firebase/
 migration-report/
+# per-project function settings may hold the owner's email; keep only examples and the emulator file
+functions/.env.*
+!functions/.env.*.example
+!functions/.env.demo-transfasa

@@ -1,0 +1,23 @@
+{
+  "firestore": [
+    {
+      "database": "transfasa",
+      "rules": "firestore.rules",
+      "indexes": "firestore.indexes.json"
+    }
+  ],
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "transfasa",
+      "runtime": "nodejs20",
+      "ignore": ["node_modules", "src", "*.log", "tsconfig*.json", ".env.*.example"]
+    }
+  ],
+  "hosting": {
+    "site": "transfasa-pro-gn",
+    "public": "apps/web/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [{ "source": "**", "destination": "/index.html" }]
+  }
+}

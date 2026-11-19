@@ -229,6 +229,30 @@ export const DICTIONARY = {
   'common.saved': { fr: 'Enregistré', en: 'Saved' },
   'common.back': { fr: 'Retour', en: 'Back' },
   'common.confirm': { fr: 'Confirmer', en: 'Confirm' },
+  // Go-live
+  'nav.import.legacy': { fr: 'Import ancienne app', en: 'Legacy import' },
+  'claim.title': { fr: 'Premier accès', en: 'First access' },
+  'claim.text': {
+    fr: 'Si vous êtes le gérant et qu’aucun gérant n’existe encore, activez votre accès.',
+    en: 'If you are the owner and no owner exists yet, activate your access.',
+  },
+  'claim.button': { fr: 'Je suis le gérant', en: 'I am the owner' },
+  'legacy.title': { fr: 'Import de l’ancienne application', en: 'Import from the current app' },
+  'legacy.intro': {
+    fr: 'Choisissez les 3 fichiers exportés de TransFasa (voyages, dépenses, résumé). Un import déjà fait ne crée pas de doublons.',
+    en: 'Choose the 3 files exported from TransFasa (trips, expenses, summary). Re-importing never creates duplicates.',
+  },
+  'legacy.trips': { fr: 'Fichier voyages (voyages.json)', en: 'Trips file (voyages.json)' },
+  'legacy.expenses': { fr: 'Fichier dépenses (depenses.json)', en: 'Expenses file (depenses.json)' },
+  'legacy.summary': { fr: 'Fichier résumé (resume.json, pour le contrôle)', en: 'Summary file (resume.json, for the check)' },
+  'legacy.run': { fr: 'Importer', en: 'Import' },
+  'legacy.running': { fr: 'Import en cours… (jusqu’à 2 minutes)', en: 'Importing… (up to 2 minutes)' },
+  'legacy.ok': { fr: 'Contrôle OK — tous les chiffres correspondent', en: 'Check OK — every figure matches' },
+  'legacy.mismatch': { fr: 'Écarts détectés', en: 'Differences found' },
+  'legacy.review': { fr: 'À vérifier', en: 'To review' },
+  'legacy.excluded': { fr: 'Lignes exclues', en: 'Excluded rows' },
+  'legacy.badFile': { fr: 'Fichier illisible (JSON attendu)', en: 'Unreadable file (JSON expected)' },
+
   // Common
   'common.save': { fr: 'Enregistrer', en: 'Save' },
   'common.cancel': { fr: 'Annuler', en: 'Cancel' },

@@ -6,6 +6,41 @@ import { useAuth } from '../auth/AuthProvider';
 import { Stacked } from '../components/Bilingual';
 import { NAV } from '../nav';
 import { OpsDashboard } from './OpsDashboard';
+import { useState } from 'react';
+import { label } from '@transfasa/i18n';
+import { callable } from '../lib/firebase';
+import { errorMessage } from '../lib/errors';
+
+/** Shown to a signed-in account with no role: explains, and lets the configured owner bootstrap. */
+function ClaimOwnership() {
+  const { user } = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const claim = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await callable('claimOwnership')();
+      await user?.getIdToken(true);
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="card space-y-3 p-5 text-sm">
+      <p className="text-red-700" role="alert">
+        {msg('auth.noRole')}
+      </p>
+      <p className="text-cement-700">{label('claim.text')}</p>
+      <button className="btn-secondary" onClick={claim} disabled={busy}>
+        {label('claim.button')}
+      </button>
+      {error && <p className="field-error">{error}</p>}
+    </div>
+  );
+}
 
 export function DashboardPage() {
   const { profile, roles } = useAuth();
@@ -28,9 +63,7 @@ export function DashboardPage() {
       </header>
 
       {roles.length === 0 ? (
-        <p className="card p-5 text-sm text-red-700" role="alert">
-          {msg('auth.noRole')}
-        </p>
+        <ClaimOwnership />
       ) : can(roles, 'dashboard.ops') ? (
         <OpsDashboard />
       ) : (

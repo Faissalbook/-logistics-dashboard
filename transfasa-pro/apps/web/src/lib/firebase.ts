@@ -16,7 +16,9 @@ export const app = initializeApp({
 });
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+/** Named database when TransFasa shares a Firebase project with another app (e.g. "transfasa"). */
+const databaseId = env.VITE_FIRESTORE_DATABASE || '(default)';
+export const db = databaseId === '(default)' ? getFirestore(app) : getFirestore(app, databaseId);
 export const functions = getFunctions(app, REGION);
 
 if (useEmulators) {
@@ -27,4 +29,5 @@ if (useEmulators) {
 }
 
 /** Typed callable wrapper. */
-export const callable = <Req, Res = unknown>(name: string) => httpsCallable<Req, Res>(functions, name);
+export const callable = <Req, Res = unknown>(name: string, timeout?: number) =>
+  httpsCallable<Req, Res>(functions, name, timeout ? { timeout } : undefined);

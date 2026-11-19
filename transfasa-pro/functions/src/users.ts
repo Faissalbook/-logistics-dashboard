@@ -1,7 +1,7 @@
 import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { type Role, isRole, normaliseRoles } from '@transfasa/domain';
-import { COL, adminAuth, db } from './admin';
+import { COL, adminAuth, db, setRolesClaim } from './admin';
 import { type Actor, auditedTransaction } from './audit';
 
 export interface CreateUserInput {
@@ -73,7 +73,7 @@ export async function createUserWithRoles(actor: Actor, input: CreateUserInput):
       });
       record({ action: 'user_create', entity: 'user', entityId: uid, before: null, after: profile });
     });
-    await adminAuth.setCustomUserClaims(uid, { roles: input.roles });
+    await setRolesClaim(uid, input.roles);
   } catch (e) {
     // Keep Auth and Firestore consistent: roll back the Auth account if the profile failed.
     await adminAuth.deleteUser(uid).catch(() => undefined);
@@ -102,7 +102,7 @@ export async function setRoles(actor: Actor, uid: string, roles: Role[]): Promis
     });
     record({ action: 'role_change', entity: 'user', entityId: uid, before: { roles: before }, after: { roles } });
   });
-  await adminAuth.setCustomUserClaims(uid, { roles });
+  await setRolesClaim(uid, roles);
 }
 
 /** Enable/disable an account; disabling also revokes refresh tokens. */
@@ -124,4 +124,48 @@ export async function setDisabled(actor: Actor, uid: string, disabled: boolean):
   });
   await adminAuth.updateUser(uid, { disabled });
   if (disabled) await adminAuth.revokeRefreshTokens(uid);
+}
+
+/**
+ * First-owner bootstrap without a service-account key: a signed-in account whose email matches
+ * BOOTSTRAP_OWNER_EMAIL (set at deploy time, never committed) becomes OWNER — only while no
+ * OWNER exists. Create that account first in the Firebase console so nobody else can register it.
+ */
+export async function claimOwnership(uid: string, email: string | undefined): Promise<void> {
+  const expected = (process.env.BOOTSTRAP_OWNER_EMAIL ?? '').trim().toLowerCase();
+  if (!expected)
+    throw new HttpsError('failed-precondition', 'Configuration manquante (BOOTSTRAP_OWNER_EMAIL not set)');
+  if (!email || email.toLowerCase() !== expected)
+    throw new HttpsError('permission-denied', 'Ce compte ne peut pas devenir gérant (This account cannot claim ownership)');
+  const actor = { uid, roles: [] as string[] };
+  const ref = db.collection(COL.users).doc(uid);
+  await auditedTransaction(actor, async (tx, record) => {
+    const [owners, snap] = await Promise.all([
+      tx.get(db.collection(COL.users).where('roles', 'array-contains', 'OWNER').limit(1)),
+      tx.get(ref),
+    ]);
+    if (!owners.empty)
+      throw new HttpsError('failed-precondition', 'Un gérant existe déjà (An owner already exists)');
+    const user = await adminAuth.getUser(uid);
+    const profile = {
+      email: email.toLowerCase(),
+      fullName: snap.get('fullName') ?? user.displayName ?? email,
+      phone: snap.get('phone') ?? null,
+      roles: ['OWNER'],
+      disabled: false,
+    };
+    tx.set(
+      ref,
+      {
+        ...profile,
+        ...(snap.exists ? {} : { createdAt: FieldValue.serverTimestamp(), createdBy: uid }),
+        updatedAt: FieldValue.serverTimestamp(),
+        updatedBy: uid,
+        rolesUpdatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    record({ action: 'role_change', entity: 'user', entityId: uid, before: { roles: [] }, after: { roles: ['OWNER'] }, reason: 'bootstrap' });
+  });
+  await setRolesClaim(uid, ['OWNER']);
 }

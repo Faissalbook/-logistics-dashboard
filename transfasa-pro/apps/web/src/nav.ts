@@ -10,6 +10,7 @@ import {
   ScrollText,
   Ship,
   Truck,
+  Upload,
   Users,
 } from 'lucide-react';
 
@@ -32,5 +33,6 @@ export const NAV: NavItem[] = [
   { path: '/reports', label: 'nav.reports', icon: FileBarChart, perm: 'export.run', phase: 2 },
   { path: '/reference', label: 'nav.reference', icon: MapPin, perm: 'refData.write', phase: 0 },
   { path: '/admin/users', label: 'nav.users', icon: Users, perm: 'user.manage', phase: 0 },
+  { path: '/admin/import', label: 'nav.import.legacy', icon: Upload, perm: 'user.manage', phase: 0 },
   { path: '/admin/audit', label: 'nav.audit', icon: ScrollText, perm: 'audit.read', phase: 0 },
 ];

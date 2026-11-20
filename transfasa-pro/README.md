@@ -75,6 +75,18 @@ npm run setup:scratch3code -- votre@email.com              # l'e-mail du compte 
 npm run deploy:scratch3code
 ```
 
+### Ou : publier depuis GitHub, sans ordinateur
+
+Le workflow `.github/workflows/transfasa-pro-deploy-scratch3code.yml` fait tout (tests, base `transfasa`, site, contrôle qu'aucune fonction ScratchCode ne serait remplacée, publication). Une seule fois, dans le navigateur :
+
+1. Google Cloud → *IAM et administration → Comptes de service* du projet `scratch3code` → **Créer un compte de service** `transfasa-deploy`, rôles **Éditeur** et **Utilisateur du compte de service**.
+2. Ce compte → onglet *Clés* → *Ajouter une clé → JSON* (un fichier se télécharge — ne le partagez avec personne).
+3. GitHub → dépôt → *Settings → Secrets and variables → Actions → New repository secret* :
+   - `FIREBASE_SA_SCRATCH3CODE` : tout le contenu du fichier JSON ;
+   - `TRANSFASA_OWNER_EMAIL` : votre e-mail de gérant.
+
+Ensuite, chaque modification de `transfasa-pro/deploy/scratch3code.trigger` sur la branche publie (Claude peut le faire pour vous). Le résultat et l'adresse du site s'affichent dans l'onglet *Actions*.
+
 Si le nom `transfasa-pro-gn` est déjà pris, choisissez-en un autre et remplacez-le dans `firebase.scratch3code.json`.
 
 Ensuite :

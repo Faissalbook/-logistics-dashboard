@@ -1,0 +1,124 @@
+name: TransFasa Pro — publish to scratch3code
+
+# Publishes TransFasa Pro inside the Firebase project "scratch3code" without touching ScratchCode:
+# own hosting site, own Firestore database ("transfasa"), own functions codebase ("transfasa").
+#
+# Runs when transfasa-pro/deploy/scratch3code.trigger changes on this branch (edit that file to
+# publish again), or manually from the Actions tab once this workflow is on the default branch.
+#
+# Repository secrets required (Settings → Secrets and variables → Actions):
+#   FIREBASE_SA_SCRATCH3CODE  — JSON key of a service account of project scratch3code (see README)
+#   TRANSFASA_OWNER_EMAIL     — email of the account that may click « Je suis le gérant »
+
+on:
+  push:
+    branches: [claude/transfasa-pro-prd-idz1ge]
+    paths: ['transfasa-pro/deploy/scratch3code.trigger']
+  workflow_dispatch:
+
+concurrency:
+  group: transfasa-pro-deploy-scratch3code
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: transfasa-pro
+
+env:
+  PROJECT: scratch3code
+  DATABASE: transfasa
+  LOCATION: europe-west1
+
+jobs:
+  deploy:
+    name: Build, test, publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check secrets
+        env:
+          SA: ${{ secrets.FIREBASE_SA_SCRATCH3CODE }}
+          OWNER: ${{ secrets.TRANSFASA_OWNER_EMAIL }}
+        run: |
+          missing=0
+          if [ -z "$SA" ]; then echo "::error::Secret FIREBASE_SA_SCRATCH3CODE manquant (missing)"; missing=1; fi
+          if [ -z "$OWNER" ]; then echo "::error::Secret TRANSFASA_OWNER_EMAIL manquant (missing)"; missing=1; fi
+          exit $missing
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: transfasa-pro/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint, typecheck, unit tests
+        run: npm run check
+
+      - name: Service account credentials
+        env:
+          SA: ${{ secrets.FIREBASE_SA_SCRATCH3CODE }}
+        run: |
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+          node -e "const k=require(process.argv[1]); if(k.project_id!=='scratch3code'){console.error('::error::La clé n est pas celle du projet scratch3code (key project: '+k.project_id+')');process.exit(1)} console.log('Service account:', k.client_email)" "$RUNNER_TEMP/sa.json"
+
+      - name: Functions settings (database + owner email)
+        env:
+          OWNER: ${{ secrets.TRANSFASA_OWNER_EMAIL }}
+        run: npm run setup:scratch3code -- "$OWNER"
+
+      - name: Ensure Firestore database "transfasa" exists
+        run: |
+          if npx firebase firestore:databases:get "$DATABASE" --project "$PROJECT" > /dev/null 2>&1; then
+            echo "Database $DATABASE already exists"
+          else
+            npx firebase firestore:databases:create "$DATABASE" --location="$LOCATION" --project "$PROJECT"
+          fi
+
+      - name: Ensure hosting site exists
+        run: |
+          SITE=$(node -p "require('./firebase.scratch3code.json').hosting.site")
+          echo "SITE=$SITE" >> "$GITHUB_ENV"
+          if npx firebase hosting:sites:get "$SITE" --project "$PROJECT" > /dev/null 2>&1; then
+            echo "Site $SITE already exists"
+          else
+            npx firebase hosting:sites:create "$SITE" --project "$PROJECT"
+          fi
+
+      - name: Make sure no ScratchCode function would be replaced
+        run: |
+          npx firebase functions:list --project "$PROJECT" --json > "$RUNNER_TEMP/functions.json" || { cat "$RUNNER_TEMP/functions.json"; exit 1; }
+          node scripts/check-function-conflicts.mjs "$LOCATION" < "$RUNNER_TEMP/functions.json"
+
+      - name: Build
+        run: npm run build:scratch3code
+
+      - name: Deploy (only TransFasa's database rules, functions codebase and site)
+        run: >
+          npx firebase deploy
+          --config firebase.scratch3code.json
+          --project "$PROJECT"
+          --only firestore,functions:transfasa,hosting
+          --non-interactive --force
+
+      - name: Summary
+        if: success()
+        run: |
+          {
+            echo "### TransFasa Pro publié / published"
+            echo ""
+            echo "- Site : https://$SITE.web.app"
+            echo "- Base Firestore : $DATABASE ($LOCATION)"
+            echo "- Fonctions : groupe \`transfasa\` ($LOCATION)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json" functions/.env.scratch3code
